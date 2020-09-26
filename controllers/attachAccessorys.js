@@ -15,6 +15,7 @@ module.exports ={
             //console.log(accessories.length>0)
             res.render("attachAccessory",{
                 title:"Create Accessory Page",
+                loggedIn:req.login,
                 cube:cube,
                 accessorys:accessories,
                 accessoryAmount:(accessories.length>0)

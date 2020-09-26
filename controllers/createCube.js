@@ -1,48 +1,44 @@
 
+const jwt = require("jsonwebtoken");
+const secret = require("../config/config").secret;
+const User = require("../models/User");
 const Cube = require("../models/Cube");
 const Accessory = require("../models/Accessory");
-const { check, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 
 module.exports ={
     route:(req,res)=>{
         res.render("createCube",{
-            title:"Create Cube Page"
+            title:"Create Cube Page",
+            loggedIn:req.login,
         });
         
      },
     data:(req,res)=>{
         let formData = req.body;
         //console.log(formData);
-        check("name").notEmpty().isString().trim();
-        check("description").notEmpty().isString().trim().isLength({max:200});
-        check("imageUrl").notEmpty().custom(value =>{
-            if (/^((https?|ftp):)?\/\/.*(jpeg|jpg|png|gif|bmp)$/.test(value)) {
-                throw new Error('Please make sure you add in an image (ends in .png, .jpg, .jpeg, .gif).');
-              }
-              // Indicates the success of this synchronous custom validator
-              return true;
-        });                                             
-        check("difficultyLevel").notEmpty().isInt({ min: 1, max: 6 });
-        const errors = validationResult(req);
-        console.log(errors);
-        if(!errors.isEmpty()){
-            console.log("fail");
-            res.status(422);
-        }else{
-            new Cube(formData,/* add user id here from jwt */)
-            .save().then((cube) => {
-                console.log(cube._id);
-                res.redirect("/");
-            }).catch(err=>{
-                if(err){
-                    console.log(err._message);
-                    return;
-                }
+        let decodedToken = jwt.verify(req.cookies.token,secret)
+            User.findById(decodedToken._id).then((user)=>{
+                console.log(user);
+                new Cube({
+                    name:formData.name,
+                    description:formData.description,
+                    imageUrl:formData.imageUrl,
+                    difficultyLevel:formData.difficultyLevel,
+                    createdBy:user
+                })
+                .save().then((cube) => {
+                    console.log(cube._id);
+                    res.redirect("/");
+                }).catch(err=>{
+                    if(err){
+                        console.log(err._message);
+                        return;
+                    }
+                });
             });
            
-        }   
-    
-    }
+    }   
 };
 
 function validURL(str) {

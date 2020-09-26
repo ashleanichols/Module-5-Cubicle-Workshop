@@ -5,7 +5,8 @@ const { check, validationResult } = require('express-validator');
 module.exports ={
     route:(req,res)=>{
         res.render("createAccessory",{
-            title:"Create Accessory Page"
+            title:"Create Accessory Page",
+            loggedIn:req.login,
         });
         
      },
