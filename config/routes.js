@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-let loggedIn =  require('./config/config').loggedIn;
+let loggedIn =  require('./config').loggedIn;
 
 let homeRouter = require("../controllers/home.js");
 let aboutRouter = require("../controllers/about.js");
@@ -61,8 +61,51 @@ module.exports = (app) => {
     app.get("/register",(req,res)=>{
         registerRoute(req,res);
     });
-    app.post("/register",(req,res)=>{
-        registerData(req,res);
+    app.post("/register",[
+        check("username")
+            .trim()
+            .isString()
+            .isLength({min:1})
+            .withMessage('password must be filled in'),
+        check("password")
+            .trim()
+            .isString()
+            .isLength({min:1})
+            .withMessage('password must be filled in'),
+        check("repeatPassword")
+            .trim()
+            .isString()
+            .isLength({min:1})
+            .withMessage('repeatPassword must be filled in')
+        
+    ],(req,res)=>{
+        const errors = validationResult(req);
+        let {password, repeatPassword} = req.body;
+        
+        
+        if (!errors.isEmpty()) {
+            res.status(422)
+            console.log(errors.array())
+            registerRoute(req,res,{
+                message: 'Validation failed, entered data is incorrect',
+                errors: errors.array()
+                });
+            
+            console.log("error!");
+        } else if(password!= repeatPassword){
+            res.status(422).json({
+                message: 'Validation failed, entered data is incorrect',
+                errors: [{
+                    value: [password,repeatPassword],
+                    msg: "password and repeatPassword must be the same!",
+                    params: ["password","repeatPassword"],
+                    location: "body"
+                }]
+                });
+                console.log("error!");
+        } else { 
+            registerData(req,res);
+        }
     });
     app.get("/edit",(req,res)=>{
         editRoute(req,res);

@@ -25,11 +25,12 @@ module.exports ={
         //console.log(errors);
         if(!errors.isEmpty()){
             console.log("fail");
-            res.status(422);
+            res.status(400);
         }else{
             new Accessory(formData)
             .save().then((acc) => {
                 console.log(acc._id);
+                res.status(201);
                 res.redirect("/");
             }).catch(err=>{
                 if(err){

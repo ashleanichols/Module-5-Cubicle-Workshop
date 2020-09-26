@@ -4,8 +4,14 @@
     {{>header}}
     <main>
 	<h1>Register Form</h1>
+  {{#if errorData}}
+    {{#each errorData.errors}}
+      <div>{{msg}}</div>
+    {{/each}}
+  {{/if}}
+
 <div class="form">
-    <form action='/' method="POST">
+    <form action='/register' method="POST">
         <label for="username">Username</label>
         <input type="text" id="username" name="username">
 
@@ -14,6 +20,7 @@
 
         <label for="repeatPassword">Re-Password</label>
         <input type="password" id="repeatPassword" name="repeatPassword">
+        <br>
         <input type="submit" value="Register">
     </form>
 </div>
