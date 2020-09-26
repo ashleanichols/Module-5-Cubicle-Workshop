@@ -18,10 +18,7 @@ module.exports = (req,res)=>{
             cube:cube,
             owned:owned,
             accessory:cube.accessories
-   
-        });
-       
-        
+        });   
     });   
 
  };
